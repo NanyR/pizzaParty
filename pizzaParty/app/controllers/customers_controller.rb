@@ -1,10 +1,12 @@
 class CustomersController < ApplicationController
-
+  skip_before_action :verify_authenticity_token
 
   def create
     customer=Customer.new(customer_params)
     if customer.save
-      render json: image
+      render json: customer
+    else
+      render json:"Error, could not create customer", status: 401
     end
   end
 
