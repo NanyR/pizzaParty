@@ -10,12 +10,13 @@ class CustomersController < ApplicationController
     end
   end
 
-  def update
-    customer= Customer.find(params[:id])
-    if customer.update(customer_params)
-      render json: {name: customer.name, phone: customer.phone}
+
+  def index
+    customers=Customer.find_by(phone: params[:phone])
+    if customers
+      render json: customers
     else
-      render json: "Error- there was an error updating this customer", status: 401
+      render json: "Error- could not find any results for this request"
     end
   end
 

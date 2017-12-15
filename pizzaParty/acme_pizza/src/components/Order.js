@@ -1,40 +1,38 @@
 import React, {Component} from 'react'
-import axios from 'axios'
-
+import CustomerForm from './CustomerForm'
+import OrderForm from './OrderForm'
 import PizzaForm from './PizzaForm'
+import axios from 'axios'
 
 export default class Order extends Component{
   constructor(props){
     super(props)
     this.state={
-      pickup_time:'',
-      isChecked:false,
-      pizzas: null,
-
-      failed:false
+      customer:null,
+      pickupTime:null,
+      orderList:[],
+      menu: ["Pepperoni", "Cheese", "Hawaiian", "Veggie"],
+      pizzaSizes:["small", "medium", "large"],
+      failed:false,
+      orderNumber:null
     }
-    this.handleInput=this.handleInput.bind(this)
-    this.handleSubmit=this.handleSubmit.bind(this)
+    this.createCustomer=this.createCustomer.bind(this)
+    this.updatePickUp=this.updatePickUp.bind(this)
+    this.updateOrderList=this.updateOrderList.bind(this)
+    this.processOrder=this.processOrder.bind(this)
+    this.findCustomer=this.findCustomer.bind(this)
   }
 
-  handleInput=(e)=>{
-    const target = e.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-    this.setState({
-      [e.target.name]: value
-    })
-  }
-
-  handleSubmit=(e)=>{
-    e.preventDefault()
-    debugger
+  createCustomer=(customerInfo)=>{
     axios({
 			method: 'POST',
-			url: `http://localhost:3001/customers/${this.props.customer_id}/orders`,
-			data: {pickup_time: this.state.pickup_time, pizzas:this.state.pizzas}
+			url: 'http://localhost:3001/customers',
+			data: customerInfo
 		}).then(resp => {
-				console.log(resp)
+        var currentCustomer= Object.assign({}, this.state.customer, resp.data )
+        this.setState({
+          customer: currentCustomer
+        })
 			}).catch((error) => {
 			this.setState({
 				failed: true
@@ -42,20 +40,77 @@ export default class Order extends Component{
 		})
   }
 
-  render(){
-      const error= this.state.failed ? <p className="error-new-customer">Sorry; we were not able to submit this order, please try again and make sure that date and time of pick up is accurate</p> : null
-    return(
-      <div className='new-order'>
-        <h2>New Order</h2>
-          {error}
-        <form onSubmit={this.handleSubmit}>
-          <label for="pickuptime">Pickup Time</label>
-            <input type="text" name="pickuptime" value={this.state.pickup_time} onChange={this.handleInput}/>
-            <PizzaForm pizzas={["Pepperoni", "Cheese", "Hawaiian", "Veggie"]} sizes={["small", "medium", "large"]}/>
+  findCustomer=(customerPhone)=>{
+    axios({
+      method: 'GET',
+      url: 'http://localhost:3001/customers',
+      params: customerPhone
+    }).then(resp => {
+        var currentCustomer= Object.assign({}, this.state.customer, resp.data )
+        this.setState({
+          customer: currentCustomer
+        })
+      }).catch((error) => {
+      this.setState({
+        failed: true
+      });
+    })
+  }
 
-          <button>Add pizza to order</button>
-        </form>
+  updatePickUp=(time)=>{
+    this.setState({
+      pickupTime: time
+    })
+  }
+
+  updateOrderList=(pizzaItem)=>{
+    this.setState({
+      orderList: [...this.state.orderList, pizzaItem]
+    })
+  }
+
+  processOrder=(e)=>{
+    e.preventDefault()
+    var jsonOrderList=JSON.stringify(this.state.orderList)
+    axios({
+			method: 'POST',
+			url: `http://localhost:3001/customers/${this.state.customer.id}/orders`,
+			data: {items: jsonOrderList, pickup_time: this.state.pickupTime, ready:false}
+		}).then(resp => {
+        this.setState({
+          orderNumber: resp.data.id,
+          failed:false
+        })
+			}).catch((error) => {
+			this.setState({
+				failed: true
+			});
+		})
+  }
+
+
+
+
+  render(){
+    const orderDetails=this.state.orderNumber ? <div><h2>Thank you! This order was submitted, here is the order number: {this.state.orderNumber}</h2></div> : null
+    return(
+    <div id="main-container">
+    {this.state.failed ? <p className="error-new-customer">Sorry; there was an error with this request</p> : null}
+          <div id="customer-container">
+            <CustomerForm createCustomer={this.createCustomer} customer={this.state.customer} findCustomer={this.findCustomer}/>
+          </div>
+          {this.state.customer ?
+            <div id="order-time">
+            <OrderForm pickupTime={this.state.pickupTime} updatePickUp={this.updatePickUp}/>
+            </div> : null }
+          {this.state.pickupTime && !orderDetails ?
+            <div id="order-details">
+            <PizzaForm orderList={this.state.orderList} menu={this.state.menu} sizes={this.state.pizzaSizes} updateOrderList={this.updateOrderList}/>
+            </div> : null }
+          {this.state.orderList.length >0 && !orderDetails? <button onClick={this.processOrder}>Process Order</button> : null}
+          {orderDetails}
       </div>
     )
   }
+
 }

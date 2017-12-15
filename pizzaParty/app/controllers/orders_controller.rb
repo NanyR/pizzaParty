@@ -3,6 +3,7 @@ class OrdersController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def create
+
     order=Order.new(order_params)
     if order.save
       render json: order
@@ -28,7 +29,7 @@ class OrdersController < ApplicationController
   private
 
   def order_params
-    params.require(:order).permit(:pickup_time, :customer_id)
+    params.require(:order).permit(:pickup_time, :customer_id, :items, :ready)
   end
 
 end

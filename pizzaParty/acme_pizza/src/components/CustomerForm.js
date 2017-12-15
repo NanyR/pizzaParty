@@ -5,12 +5,10 @@ export default class CustomerForm extends Component{
   constructor(props){
     super(props)
     this.state={
-      phone:'',
-      name:'',
-      failed:false
+      nameInput:'',
+      phoneInput:''
     }
     this.handleInput=this.handleInput.bind(this)
-    this.handleSubmit=this.handleSubmit.bind(this)
   }
 
   handleInput=(e)=>{
@@ -21,34 +19,33 @@ export default class CustomerForm extends Component{
 
   handleSubmit=(e)=>{
     e.preventDefault()
-    debugger
-    axios({
-			method: 'POST',
-			url: 'http://localhost:3001/customers',
-			data: {name: this.state.name, phone: this.state.phone}
-		}).then(resp => {
-				console.log(resp)
-			}).catch((error) => {
-			this.setState({
-				failed: true
-			});
-		})
+    this.props.createCustomer({name:this.state.nameInput, phone:this.state.phoneInput})
+  }
+
+  findCustomer=(e)=>{
+    e.preventDefault()
+    this.props.findCustomer({phone: this.state.phoneInput})
   }
 
   render(){
-      const error= this.state.failed ? <p className="error-new-customer">Sorry; this user could not be added at this time</p> : null
+
     return(
-      <div className='newCustomer'>
-        <h2>New Customer</h2>
-          {error}
-        <form onSubmit={this.handleSubmit}>
-          <label for="phone">Phone Number</label>
-            <input type="text" name="phone" value={this.state.phone} onChange={this.handleInput}/>
-          <label for="name">Name</label>
-          <input type="text" name="name" value={this.state.name} onChange={this.handleInput}/>
-          <button>Add new Customer</button>
-        </form>
+      <div>
+      <h3>Customer Info:</h3>
+      {this.props.customer ? <div id="customerInfo"><h4>{this.props.customer.name}</h4><h3>{this.props.customer.phone}</h3></div> :
+          <div>
+            <form onSubmit={this.handleSubmit}>
+              <label for="phone">Phone Number</label>
+                <input type="text" name="phoneInput" value={this.state.phoneInput} onChange={this.handleInput}/>
+              <label for="name">Name</label>
+              <input type="text" name="nameInput" value={this.state.nameInput} onChange={this.handleInput}/>
+              <button>Add new Customer</button>
+              <button onClick={this.findCustomer}>Find Customer</button>
+            </form>
+          </div>
+        }
       </div>
+
     )
   }
 

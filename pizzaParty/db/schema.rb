@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171214020414) do
+ActiveRecord::Schema.define(version: 20171215045811) do
 
   create_table "customers", force: :cascade do |t|
     t.string   "name"
@@ -20,22 +20,7 @@ ActiveRecord::Schema.define(version: 20171214020414) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "orders", force: :cascade do |t|
-    t.datetime "pickup_time"
-    t.integer  "customer_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
-  add_index "orders", ["customer_id"], name: "index_orders_on_customer_id"
-
-  create_table "pizzas", force: :cascade do |t|
-    t.string   "type"
-    t.integer  "order_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  add_index "pizzas", ["order_id"], name: "index_pizzas_on_order_id"
+# Could not dump table "orders" because of following NoMethodError
+#   undefined method `[]' for nil:NilClass
 
 end

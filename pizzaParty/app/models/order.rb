@@ -1,4 +1,9 @@
 class Order < ActiveRecord::Base
   belongs_to :customer
-  has_many :pizzas
+
+  validates :items, presence: true
+  validates :pickup_time, presence: true
+
+
+
 end
