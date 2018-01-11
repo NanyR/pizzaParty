@@ -26,6 +26,11 @@ class OrdersController < ApplicationController
     render json: order
   end
 
+  def index
+    orders=Order.order(:pickup_time)
+    render json: orders
+  end
+
   private
 
   def order_params

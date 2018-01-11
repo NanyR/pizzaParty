@@ -72,11 +72,13 @@ export default class Order extends Component{
   processOrder=(e)=>{
     e.preventDefault()
     var jsonOrderList=JSON.stringify(this.state.orderList)
+    debugger
     axios({
 			method: 'POST',
 			url: `http://localhost:3001/customers/${this.state.customer.id}/orders`,
-			data: {items: jsonOrderList, pickup_time: this.state.pickupTime, ready:false}
+			data: {items: jsonOrderList, pickup_time: this.state.pickupTime, ready:false, customer_id: this.state.customer.id}
 		}).then(resp => {
+      debugger
         this.setState({
           orderNumber: resp.data.id,
           failed:false

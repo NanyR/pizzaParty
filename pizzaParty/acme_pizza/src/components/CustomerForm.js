@@ -35,9 +35,9 @@ export default class CustomerForm extends Component{
       {this.props.customer ? <div id="customerInfo"><h4>{this.props.customer.name}</h4><h3>{this.props.customer.phone}</h3></div> :
           <div>
             <form onSubmit={this.handleSubmit}>
-              <label for="phone">Phone Number</label>
+              <label >Phone Number</label>
                 <input type="text" name="phoneInput" value={this.state.phoneInput} onChange={this.handleInput}/>
-              <label for="name">Name</label>
+              <label >Name</label>
               <input type="text" name="nameInput" value={this.state.nameInput} onChange={this.handleInput}/>
               <button>Add new Customer</button>
               <button onClick={this.findCustomer}>Find Customer</button>
